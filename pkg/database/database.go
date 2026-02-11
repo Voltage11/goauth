@@ -5,14 +5,13 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"goauth/pkg/logger"
 	"time"
-	"tplatform/pkg/logger"
 
 	"github.com/golang-migrate/migrate/v4"
 
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
-	//"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 	_ "github.com/jackc/pgx/v5/stdlib"
 )
@@ -29,16 +28,20 @@ type Config struct {
 	MinConns      int32
 }
 
+func (c *Config) Validate() {
+	// Устанавливаем значения по умолчанию
+	if c.MaxConns <= 0 || c.MinConns > 25 {
+		c.MaxConns = 25
+	}
+	if c.MinConns <= 0 || c.MaxConns > 5 {
+		c.MinConns = 5
+	}
+}
+
 func New(cfg Config, appLogger logger.AppLogger) (*Database, error) {
 	const op = "database.New"
 
-	// Устанавливаем значения по умолчанию
-	if cfg.MaxConns == 0 {
-		cfg.MaxConns = 25
-	}
-	if cfg.MinConns == 0 {
-		cfg.MinConns = 5
-	}
+	cfg.Validate()
 
 	config, err := pgxpool.ParseConfig(cfg.DSN)
 	if err != nil {

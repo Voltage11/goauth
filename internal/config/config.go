@@ -13,6 +13,8 @@ type DbConfig struct {
 	User          string `env:"DB_USER" env-required:"true"`
 	Password      string `env:"DB_PASSWORD" env-required:"true"`
 	MigrationPath string `env:"DB_MIGRATION_PATH" env-required:"true"`
+	MaxConns      int    `env:"DB_MAX_CONNS" env-required:"25"`
+	MinConns      int    `env:"DB_MIN_CONNS" env-required:"5"`
 }
 
 type SecretConfig struct {
